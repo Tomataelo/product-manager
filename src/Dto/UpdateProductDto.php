@@ -24,6 +24,9 @@ class UpdateProductDto
         message: 'Status must be one of: active, inactive'
     )]
     private ?string $status = null;
+    #[Assert\NotNull]
+    #[Assert\Positive]
+    private ?int $version = null;
 
     public function getName(): ?string
     {
@@ -73,5 +76,15 @@ class UpdateProductDto
     public function setStatus(?string $status): void
     {
         $this->status = $status;
+    }
+
+    public function setVersion(?int $version): void
+    {
+        $this->version = $version;
+    }
+
+    public function getVersion(): ?int
+    {
+        return $this->version;
     }
 }

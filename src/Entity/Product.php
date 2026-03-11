@@ -54,6 +54,11 @@ class Product
     #[Groups(['product:read', 'product:write'])]
     private ?\DateTimeImmutable $created_at;
 
+    #[ORM\Version]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['product:read', 'product:write'])]
+    private int $version = 1;
+
     public function __construct()
     {
         $this->created_at = new \DateTimeImmutable();
@@ -177,5 +182,10 @@ class Product
         $this->is_deleted = $is_deleted;
 
         return $this;
+    }
+
+    public function getVersion(): int
+    {
+        return $this->version;
     }
 }

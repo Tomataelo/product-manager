@@ -13,6 +13,8 @@ use App\Exception\ProductNotFoundException;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Doctrine\ORM\OptimisticLockException;
+use App\Exception\ProductConflictException;
 
 readonly class ProductService
 {
@@ -70,7 +72,12 @@ readonly class ProductService
             $product->setStatus(Status::from($updateProductDto->getStatus()));
         }
 
-        $this->productRepository->save($product);
+        try {
+            $this->productRepository->lockProduct($product, $updateProductDto->getVersion());
+            $this->productRepository->save($product);
+        } catch (OptimisticLockException) {
+            throw new ProductConflictException();
+        }
 
         return $product;
     }
@@ -79,13 +86,8 @@ readonly class ProductService
     {
         $product = $this->getProduct($id);
         $product->setIsDeleted(true);
-        $this->productRepository->save($product);
-    }
 
-    public function getNotDelProduct(int $id): Product
-    {
-        return $this->productRepository->findOneBy(['is_deleted' => false])
-            ?? throw new ProductNotFoundException($id);
+        $this->productRepository->save($product);
     }
 
     public function getProduct(int $id): Product

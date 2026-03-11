@@ -2,11 +2,13 @@
 
 namespace App\Repository;
 
+use App\Dto\UpdateProductDto;
 use Doctrine\ORM\QueryBuilder;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\DBAL\LockMode;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -21,6 +23,10 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function lockProduct(Product $product, int $version): void
+    {
+        $this->entityManager->lock($product, LockMode::OPTIMISTIC, $version);
+    }
     public function save(Product $product): void
     {
         $this->entityManager->persist($product);

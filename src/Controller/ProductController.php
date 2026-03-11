@@ -19,10 +19,6 @@ class ProductController extends AbstractController
         private readonly ProductService $productService,
     ) {}
 
-    // Co napewno zostało do roboty (co pamiętam tera):
-    // Obsługa współbieżności
-    // Testy
-
     #[Route('', methods: ['POST'])]
     public function createProduct(#[MapRequestPayload] ProductDto $productDto): JsonResponse
     {
@@ -40,15 +36,8 @@ class ProductController extends AbstractController
     #[Route('/{id}', methods: ['GET'])]
     public function getProduct(int $id): JsonResponse
     {
-        $product = $this->productService->getNotDelProduct($id);
+        $product = $this->productService->getProduct($id);
         return $this->json($product, context: ['groups' => ['product:read', 'product:write']]);
-    }
-
-    #[Route('/{id}', methods: ['DELETE'])]
-    public function deleteProduct(int $id): JsonResponse
-    {
-        $this->productService->deleteProduct($id);
-        return $this->json(1);
     }
 
     #[Route('', methods: ['GET'])]
@@ -62,4 +51,10 @@ class ProductController extends AbstractController
         return $this->json($products, context: ['groups' => ['product:read', 'product:write']]);
     }
 
+    #[Route('/{id}', methods: ['DELETE'])]
+    public function deleteProduct(int $id): JsonResponse
+    {
+        $this->productService->deleteProduct($id);
+        return $this->json(1);
+    }
 }
